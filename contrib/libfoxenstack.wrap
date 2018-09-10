@@ -1,0 +1,4 @@
+[wrap-git]
+directory=libfoxenstack
+url=https://github.com/astoeckel/libfoxenstack
+revision=head
