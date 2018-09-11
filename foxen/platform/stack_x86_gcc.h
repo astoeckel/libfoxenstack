@@ -34,7 +34,7 @@ static void *_fx_stack_switch(void *stack_start, void *stack_end, void *stack_pt
 	    "mov %%ebx, %%esp\n\t"
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
-	    : "ebx", "esp");
+	    : "ebx");
 
 	return result;
 }
