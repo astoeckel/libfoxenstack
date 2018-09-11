@@ -16,9 +16,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-static void *_fx_stack_switch(void *stack_start, void *stack_end, void *stack_ptr,
-                                    fx_stack_cback cback, void *data)
-{
+static void *_fx_stack_switch(void *stack_start, void *stack_end,
+                              void *stack_ptr, fx_stack_cback cback,
+                              void *data) {
 	/* Suppress unused warning */
 	(void)stack_start;
 	(void)stack_end;
