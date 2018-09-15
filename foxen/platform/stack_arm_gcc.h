@@ -16,8 +16,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-static void *_fx_stack_switch(void *stack_ptr, fx_stack_cback cback, void *data)
-{
+__attribute__((noinline)) static void *_fx_stack_switch(void *stack_ptr,
+                                                        fx_stack_cback cback,
+                                                        void *data) {
 	void *result;
 
 	__asm__ __volatile__(

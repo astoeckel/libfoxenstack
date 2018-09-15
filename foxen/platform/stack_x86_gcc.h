@@ -16,16 +16,29 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-static void *_fx_stack_switch(void *stack_ptr, fx_stack_cback cback, void *data)
-{
+__attribute__((noinline)) static void *_fx_stack_switch(void *stack_ptr,
+                                                        fx_stack_cback cback,
+                                                        void *data) {
 	void *result;
 
 	__asm__ __volatile__(
+	    /* Store stack_ptr in ebx */
 	    "mov %1, %%ebx\n\t"
+
+	    /* Exchange ebx and esp, effectively making stack_ptr the new stack
+	       pointer. */
 	    "xchg %%esp, %%ebx\n\t"
+
+	    /* Pass "data" to the function as an argument */
 	    "push %2\n\t"
+
+	    /* Call the function "cback" */
 	    "call *%3\n\t"
+
+	    /* Backup the return value in "result" */
 	    "mov %%eax, %0\n\t"
+
+	    /* Restore the original stack pointer */
 	    "mov %%ebx, %%esp\n\t"
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
