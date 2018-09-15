@@ -16,25 +16,31 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-static void *_fx_stack_switch(void *stack_start, void *stack_end,
-                              void *stack_ptr, fx_stack_cback cback,
-                              void *data) {
-	/* Suppress unused warning */
-	(void)stack_start;
-	(void)stack_end;
-
+static void *_fx_stack_switch(void *stack_ptr, fx_stack_cback cback, void *data)
+{
 	void *result;
 
 	__asm__ __volatile__(
+	    /* Store the stack pointer register in r4 and load the stack pointer
+	       from stack_ptr. */
 	    "mov %%r4, %%sp\n\t"
 	    "mov %%sp, %1\n\t"
+
+	    /* Call the callback function. r0 = callback, r1 = data */
 	    "mov %%r0, %2\n\t"
-	    "blx %3\n\t"
+	    "mov %%r1, %3\n\t"
+	    "blx %%r1\n\t"
+
+	    /* Write r0 to the target register */
 	    "mov %0, %%r0\n\t"
+
+	    /* Restore the original stack pointer */
 	    "mov %%sp, %%r4\n\t"
+
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
-	    : "r4", "r0");
+	    : "memory", "r4", "r1", "r0");
 
 	return result;
 }
+

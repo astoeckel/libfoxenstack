@@ -14,4 +14,12 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-option('with_valgrind', type : 'boolean', value : false)
+option('with_valgrind',
+       type: 'boolean',
+       value: false,
+       description: 'Enable runtime support for valgrind.')
+
+option('with_cpp_exceptions',
+       type: 'boolean',
+       value: true,
+       description: 'Enables generic support for C++ exceptions. Not required for x86 and x86_64.')

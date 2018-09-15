@@ -77,6 +77,7 @@ static void test_exception(void) {
 	try {
 		fx_stack_switch(stack_start, stack_end, stack_end, test_exception_cback,
 		                &data);
+		test_exception_cback(&data);
 	} catch (std::runtime_error &e) {
 		EXPECT_TRUE(std::string(e.what()) == "foobar");
 		did_catch = true;

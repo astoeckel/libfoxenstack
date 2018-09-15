@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 project(
-    'libfoxenstack', ['c', 'cpp'],
+    'libfoxenstack', ['c'],
     default_options : ['c_std=c99', 'cpp_std=c++11', 'b_ndebug=if-release'])
 
 compiler = meson.get_compiler('c')
@@ -33,15 +33,25 @@ configure_file(input : 'config.h.in',
 # Include directory
 inc_foxen = include_directories('.')
 
+# Add the search path for the valgrind headers if requested
 dep_valgrind = []
 if get_option('with_valgrind')
     dep_valgrind = dependency('valgrind', required: true)
 endif
 
+# Either compile the code as C++ or C, depending on the with_cpp_exceptions
+# flag
+if get_option('with_cpp_exceptions')
+    add_languages('cpp')
+    lib_foxenstack_src = ['foxen/stack.cpp']
+else
+    lib_foxenstack_src = ['foxen/stack.c']
+endif
+
 # Define the contents of the actual library
 lib_foxenstack = library(
     'foxenstack',
-    'foxen/stack.c',
+    lib_foxenstack_src,
     include_directories: inc_foxen,
     dependencies: [dep_valgrind],
     install: true)
@@ -59,15 +69,17 @@ exe_test_stack = executable(
     install: false)
 test('test_stack', exe_test_stack)
 
-exe_test_stack_cpp = executable(
-    'test_stack_cpp',
-    'test/test_stack_cpp.cpp',
-    include_directories: inc_foxen,
-    link_with: lib_foxenstack,
-    dependencies: dep_foxenunit,
-    install: false)
-test('test_stack_cpp', exe_test_stack_cpp)
-
+# Compile the C++-specific unit tests if C++ support is enabled
+if get_option('with_cpp_exceptions')
+    exe_test_stack_cpp = executable(
+        'test_stack_cpp',
+        'test/test_stack_cpp.cpp',
+        include_directories: inc_foxen,
+        link_with: lib_foxenstack,
+        dependencies: dep_foxenunit,
+        install: false)
+    test('test_stack_cpp', exe_test_stack_cpp)
+endif
 
 # Install the header file
 install_headers(

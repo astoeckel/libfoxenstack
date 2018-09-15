@@ -20,6 +20,7 @@
 #include <stdint.h>
 
 #include "config.h"
+
 #ifdef FX_WITH_VALGRIND
 #include <valgrind.h>
 #endif
@@ -28,6 +29,63 @@
 
 /* Include the platform-specific _fx_stack_switch function */
 #include "platform/stack_platformselect.h"
+
+/*****************************************************************************
+ * Support for C++ exception propagation                                     *
+ *****************************************************************************/
+
+#ifdef FX_WITH_CPP_EXCEPTIONS
+
+#include <exception>
+
+/**
+ * Data passed to the _fx_stack_exception_stub function. Contains the
+ * user-defined data originally passed to fx_stack_switch as well as
+ * data structures used for exception management.
+ */
+typedef struct {
+	/**
+	 * Original user-provided callback passed to fx_stack_switch().
+	 */
+	fx_stack_cback cback;
+
+	/**
+	 * Original user-provided data to be passed to the callback function.
+	 */
+	void *data;
+
+	/**
+	 * Exception-pointer instance holding any exception that may be thrown in
+	 * the user-defined function. Note that std::exception_ptr essentially is
+	 * a std::unique_ptr; this allows to transport the exception outside of the
+	 * original scope and to rethrow it.
+	 */
+	std::exception_ptr eptr;
+} fx_stack_exception_stub_data_t;
+
+static __attribute__((noinline)) void *_fx_stack_exception_stub(void *data_)
+{
+	/* Type-convert the callback data. */
+	fx_stack_stub_data_t *data = (fx_stack_stub_data_t *)data_;
+
+	/* Call the callback within an explicit try-catch block. This will make sure
+	   that exceptions are caught, even on weird architectures such as ARM which
+	   do special exception handling voodoo. */
+	try {
+		return data->cback(data->data);
+	}
+	catch (...) {
+		/* There was an exception! Move the exception into the exception_ptr
+		   instance. The calling code rethrows the exception. */
+		data->eptr = std::current_exception();
+	}
+}
+
+#endif /* FX_WITH_CPP_EXCEPTIONS */
+
+/*****************************************************************************
+ * Common stack switching code                                               *
+ *****************************************************************************/
 
 void *fx_stack_switch(void *stack_start, void *stack_end, void *stack_ptr,
                       fx_stack_cback cback, void *data)
@@ -38,16 +96,30 @@ void *fx_stack_switch(void *stack_start, void *stack_end, void *stack_ptr,
 #ifdef FX_WITH_VALGRIND
 	/* Inform valgrind that the given memory region is a new stack */
 	const int stack_id = VALGRIND_STACK_REGISTER(stack_start, stack_end);
-#endif
+#endif /* FX_WITH_VALGRIND */
 
+#ifdef FX_WITH_CPP_EXCEPTIONS
+	{
+		/* Call the platform-specific assembly function wrapped in the given
+		   stub function */
+		fx_stack_exception_stub_data_t stub_data{cback, data, nullptr};
+		void *result = _fx_stack_switch(stack_ptr, _fx_stack_stub, &stub_data);
+
+		/* Re-throw any C++ exception that was thrown by the code inside the
+		   alternative stack. */
+		if (stub_data.eptr) {
+			std::rethrow_exception(stub_data.eptr);
+		}
+	}
+#else
 	/* Call the platform-specific assembly function */
-	void *result =
-	    _fx_stack_switch(stack_start, stack_end, stack_ptr, cback, data);
+	void *result = _fx_stack_switch(stack_ptr, cback, data);
+#endif /* FX_WITH_CPP_EXCEPTIONS */
 
 #ifdef FX_WITH_VALGRIND
 	/* Inform valgrind that this memory region is no longer used as a stack */
 	VALGRIND_STACK_DEREGISTER(stack_id);
-#endif
+#endif /* FX_WITH_VALGRIND */
 
 	return result;
 }

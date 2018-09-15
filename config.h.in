@@ -16,4 +16,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* If enabled compiles runtime support for valgrind */
 #mesondefine FX_WITH_VALGRIND
+
+/* If enabled compiles the code with support for C++ exceptions */
+#mesondefine FX_WITH_CPP_EXCEPTIONS

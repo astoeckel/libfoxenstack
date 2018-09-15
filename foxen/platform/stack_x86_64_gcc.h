@@ -16,13 +16,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-static void *_fx_stack_switch(void *stack_start, void *stack_end,
-                              void *stack_ptr, fx_stack_cback cback,
-                              void *data) {
-	/* Suppress unused warning */
-	(void)stack_start;
-	(void)stack_end;
-
+static void *_fx_stack_switch(void *stack_ptr, fx_stack_cback cback, void *data)
+{
 	void *result;
 
 	__asm__ __volatile__(
@@ -34,7 +29,7 @@ static void *_fx_stack_switch(void *stack_start, void *stack_end,
 	    "mov %%rbx, %%rsp\n\t"
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
-	    : "rbx", "rdi");
+	    : "memory", "rax", "rbx", "rdi", "rsp");
 
 	return result;
 }
