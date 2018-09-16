@@ -11,15 +11,15 @@ libraries.
 * *Multi-platform.*
   Supports x86_64, i386 and ARM32 (tested on ARMv6 upwards). Patches for other platforms are welcome!
 * *C++ exception support.*
-  Correctly propagates C++ exceptions across stack boundaries -- even on ARM.
+  Correctly propagates C++ exceptions across stack boundaries―even on ARM.
   C++ exception support can be deactivated for a smaller footprint; use
   `meson configure -Dwith_cpp_exceptions=false`. Note that C++ exception
   propagation works just fine on x86 without explicit support.
-* Support for `valgrind`. If desired, `libfoxenstack` can inform valgrind about
+* *Support for `valgrind`.* If desired, `libfoxenstack` can inform valgrind about
   the new stack memory region. Activate with
   `meson configure -Dwith_valgrind=true`.
-* Thoroughly tested. Comes with a CI script that tests the code in emulation on
-  hundreds of combinations of compilers, CPU architecture and version, and
+* *Thoroughly tested.* Comes with a CI script that tests the code in emulation on
+  hundreds of combinations of compilers, CPU architecture versions, and
   configuration flags.
 
 ## How to use
