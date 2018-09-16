@@ -40,7 +40,7 @@ RUN mkdir /usr/local/include/foxen \
 # valgrind.h
 RUN mkdir /usr/include/valgrind \
 	&& cd /tmp \
-	&& curl ftp://sourceware.org/pub/valgrind/valgrind-3.13.0.tar.bz2 \
+	&& curl https://sourceware.org/pub/valgrind/valgrind-3.13.0.tar.bz2 \
 	 > valgrind.tar.bz2 \
 	&& tar -xf valgrind.tar.bz2 \
 	&& install valgrind-3.13.0/include/valgrind.h /usr/include/valgrind/valgrind.h
