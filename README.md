@@ -9,7 +9,7 @@ libraries.
 ## Features
 
 * *Multi-platform.*
-  Supports x86_64, i386 and ARM32 (tested on ARMv6 upwards). Patches for other platforms are welcome!
+  Supports the SYSV ABI (Linux, macOS) on x86_64, i386 and ARM32 (tested on ARMv6 upwards). Patches for other platforms are welcome!
 * *C++ exception support.*
   Correctly propagates C++ exceptions across stack boundaries―even on ARM.
   C++ exception support can be deactivated for a smaller footprint; use
@@ -63,9 +63,7 @@ int main() {
 }
 ```
 
- For now, supported platforms are Linux (i386, x86_64, ARM32).
-
-Patches for other platforms are welcome.
+See `foxen/stack.h` for more documentation.
 
 ## How to compile
 
