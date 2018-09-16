@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/astoeckel/libfoxenstack.svg?branch=master)](https://travis-ci.org/astoeckel/libfoxenstack)
 
-`libfoxenstack` provides a convenient C API for excuting functions in the context of
+`libfoxenstack` provides a convenient C API for executing functions in the context of
 a different stack. This is particularly useful for user-space threading
 libraries.
 
@@ -15,7 +15,7 @@ libraries.
   C++ exception support can be deactivated for a smaller footprint; use
   `meson configure -Dwith_cpp_exceptions=false`. Note that C++ exception
   propagation works just fine on x86 without explicit support.
-* *Support for `valgrind`.* If desired, `libfoxenstack` can inform valgrind about
+* *Support for `valgrind`.* If so desired, `libfoxenstack` can inform valgrind about
   the new stack memory region. Activate with
   `meson configure -Dwith_valgrind=true`.
 * *Thoroughly tested.* Comes with a CI script that tests the code in emulation on
@@ -67,8 +67,7 @@ Patches for other platforms are welcome.
 
 ## How to compile
 
-This library uses `meson` for compilation, which can be installed using `pip`.
-Furthermore, `meson` depends on the `ninja` build system.
+`libfoxenstack` uses `meson` for compilation, which can be installed using `pip` and depends on the `ninja` build system.
 
 ```
 git clone https://github.com/astoeckel/libfoxenstack
