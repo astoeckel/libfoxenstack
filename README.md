@@ -2,11 +2,102 @@
 
 [![Build Status](https://travis-ci.org/astoeckel/libfoxenstack.svg?branch=master)](https://travis-ci.org/astoeckel/libfoxenstack)
 
-This library provides a simple interface for executing a function in the
-context of a different stack. This is particularly useful for user-space
-threading libraries. For now, supported platforms are Linux (i386, x86_64, ARM).
+`libfoxenstack` provides a convenient C API for excuting functions in the context of
+a different stack. This is particularly useful for user-space threading
+libraries.
+
+## Features
+
+* *Multi-platform.*
+  Supports x86_64, i386 and ARM32 (tested on ARMv6 upwards). Patches for other platforms are welcome!
+* *C++ exception support.*
+  Correctly propagates C++ exceptions across stack boundaries -- even on ARM.
+  C++ exception support can be deactivated for a smaller footprint; use
+  `meson configure -Dwith_cpp_exceptions=false`. Note that C++ exception
+  propagation works just fine on x86 without explicit support.
+* Support for `valgrind`. If desired, `libfoxenstack` can inform valgrind about
+  the new stack memory region. Activate with
+  `meson configure -Dwith_valgrind=true`.
+* Thoroughly tested. Comes with a CI script that tests the code in emulation on
+  hundreds of combinations of compilers, CPU architecture and version, and
+  configuration flags.
+
+## How to use
+
+Just call `fx_stack_switch` with the desired stack address range and a pointer
+at the function that should be executed within the new stack.
+
+```c
+#include <stdint.h>
+
+#include <foxen/stack.h>
+
+/* Number of bytes to use for the stack */
+#define STACK_LEN 4096U
+
+/* Callback function that is running inside the new stack */
+static void *cback(void *data) {
+	int b;
+	printf("Hello World from another stack at address %p!\n", &b);
+	printf("Given data pointer is %p.", data);
+	return (void *)0xDEADBEAFU;
+}
+
+int main() {
+	/* Allocate memory for the stack */
+	void *stack_start = malloc(STACK_LEN);
+	void *stack_end = (void *)((uintptr_t)stack_start + STACK_LEN);
+
+	/* Start at the end of the stack */
+	void *stack_ptr = stack_end;
+
+	/* Call fx_stack_switch; pass a pointer to "a" as user-defined data to
+	   the callback function cback. */
+	int a;
+	void *res = fx_stack_switch(stack_start, stack_end, stack_ptr, cback, &a);
+
+	/* Free
+	free(stack_start);
+}
+```
+
+ For now, supported platforms are Linux (i386, x86_64, ARM32).
+
 Patches for other platforms are welcome.
 
+## How to compile
+
+This library uses `meson` for compilation, which can be installed using `pip`.
+Furthermore, `meson` depends on the `ninja` build system.
+
+```
+git clone https://github.com/astoeckel/libfoxenstack
+cd libfoxenstack
+mkdir build
+cd build
+meson ..
+ninja
+```
+
+Alternatively you can define the `FX_NO_CONFIG` compiler flag and just add
+`foxen/stack.c` to your project.
+
+## Unit tests
+
+Execute `ninja test` to run the unit tests for your current CPU architecture.
+
+To run the unit-tests thoroughly on all supported platforms, execute
+`test/run_platform_tests.py` from the project root directory. This script
+builds and executes the unit tests in emulation for a variety of target
+architectures.
+
+If you do not want spend ages to install a bunch of cross-compilers, you can use
+the provided `Dockerfile` to run `test/run_platform_tests.py` in a stable
+environment. Just run
+```
+docker build -t libfoxenstack .
+docker run -it libfoxenstack
+```
 
 ## FAQ about the *Foxen* series of C libraries
 
