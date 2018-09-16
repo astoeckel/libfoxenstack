@@ -1,5 +1,7 @@
 # libfoxenstack ― Library for switching user-space stacks
 
+[![Build Status](https://travis-ci.org/astoeckel/libfoxenstack.svg?branch=master)](https://travis-ci.org/astoeckel/libfoxenstack)
+
 This library provides a simple interface for executing a function in the
 context of a different stack. This is particularly useful for user-space
 threading libraries. For now, supported platforms are Linux (i386, x86_64, ARM).
