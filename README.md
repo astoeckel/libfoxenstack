@@ -69,6 +69,8 @@ See `foxen/stack.h` for more documentation.
 
 `libfoxenstack` uses `meson` for compilation, which can be installed using `pip` and depends on the `ninja` build system.
 
+You'll need a C++11 compliant compiler if you need C++ exception propagation support. If C++ exception propagation is disabled, a C99 compliant compiler is required. Compilation has been tested with both `gcc` 4.8 and newer, as well as recent versions of `clang`.
+
 ```
 git clone https://github.com/astoeckel/libfoxenstack
 cd libfoxenstack
