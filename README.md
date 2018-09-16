@@ -28,7 +28,9 @@ Just call `fx_stack_switch` with the desired stack address range and a pointer
 at the function that should be executed within the new stack.
 
 ```c
+#include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <foxen/stack.h>
 
@@ -39,7 +41,7 @@ at the function that should be executed within the new stack.
 static void *cback(void *data) {
 	int b;
 	printf("Hello World from another stack at address %p!\n", &b);
-	printf("Given data pointer is %p.", data);
+	printf("Given data pointer is %p.\n", data);
 	return (void *)0xDEADBEAFU;
 }
 
@@ -56,7 +58,7 @@ int main() {
 	int a;
 	void *res = fx_stack_switch(stack_start, stack_end, stack_ptr, cback, &a);
 
-	/* Free
+	/* Free the reserved memory */
 	free(stack_start);
 }
 ```
