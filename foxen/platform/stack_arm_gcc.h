@@ -40,7 +40,7 @@ __attribute__((noinline)) static void *_fx_stack_switch(void *stack_ptr,
 
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
-	    : "memory", "r0", "r1", "r2", "r3", "r4");
+	    : "memory", "r0", "r1", "r2", "r3", "r4", "lr");
 
 	return result;
 }
