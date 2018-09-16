@@ -42,7 +42,8 @@ __attribute__((noinline)) static void *_fx_stack_switch(void *stack_ptr,
 	    "mov %%rbx, %%rsp\n\t"
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
-	    : "memory", "rax", "rbx", "rdi", "rsp");
+	    : "memory", "rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10",
+	      "r11");
 
 	return result;
 }

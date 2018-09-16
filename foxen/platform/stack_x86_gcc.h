@@ -22,7 +22,7 @@ __attribute__((noinline)) static void *_fx_stack_switch(void *stack_ptr,
 	void *result;
 
 	__asm__ __volatile__(
-	    /* Store stack_ptr in ebx */
+	    /* Store stack_ptr in ebx. Will be preserved over the function call. */
 	    "mov %1, %%ebx\n\t"
 
 	    /* Exchange ebx and esp, effectively making stack_ptr the new stack
@@ -42,7 +42,7 @@ __attribute__((noinline)) static void *_fx_stack_switch(void *stack_ptr,
 	    "mov %%ebx, %%esp\n\t"
 	    : "=r"(result)
 	    : "r"(stack_ptr), "r"(data), "r"(cback)
-	    : "memory", "eax", "ebx", "esp");
+	    : "memory", "eax", "ebx");
 
 	return result;
 }
